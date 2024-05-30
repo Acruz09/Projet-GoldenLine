@@ -71,7 +71,7 @@ def analyses(request):
 def exporter_donnees(request):
     if request.method == 'POST':
         # Récupérer le nombre de lignes à exporter depuis le formulaire avec 10 par défaut
-        nombre_lignes = int(request.POST.get('nombre_lignes', 10))
+        nombre_lignes = int(request.POST.get("nombre_lignes", 10))
 
         # Récupérer les données à exporter depuis la base de données
         donnees = Collecte.objects.all()[:nombre_lignes]
@@ -79,15 +79,15 @@ def exporter_donnees(request):
         response = HttpResponse(content_type='text/csv')
         response['Content-Disposition'] = 'attachment; filename="export.csv"'
 
-        writer = csv.writer(response)
-        writer.writerow(['identifiant_collecte', 'detail_panier'])
+        writer = csv.writer(response, delimiter=";")
+        writer.writerow(["identifiant_collecte","prix_panier", "detail_panier"])
 
         for donnee in donnees:
-            writer.writerow([donnee.identifiant_collecte, donnee.detail_panier])
+            writer.writerow([donnee.identifiant_collecte, donnee.prix_panier, donnee.detail_panier])
 
         return response
 
-    return render(request, 'exportation_donnees.html')
+    return render(request, "exportation_donnees.html")
 
 
 def accueil(request):
