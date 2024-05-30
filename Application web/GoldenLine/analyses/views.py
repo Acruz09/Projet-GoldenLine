@@ -6,6 +6,7 @@ from django.contrib.auth.models import User, Permission, Group
 from django.contrib.auth import authenticate, login, logout
 from django.contrib import messages
 from django.urls import reverse
+from django.db.models import Avg
 from .models import *
 
 
@@ -14,61 +15,53 @@ from .models import *
 def analyses(request):
     template = 'analyses.html'
 
-    moyennes = Client.objects.values('categorie_socioprofessionnelle').annotate(moyenne_prix=models.Avg('prix_panier'))
-
-    #### Récupérer toutes les catégories
-
-    # Récupérer toutes les collectes
-    collectes = Collecte.objects.all()
-
-    # Créer un ensemble pour stocker les catégories uniques
-    categories = []
-
-    # Parcourir toutes les collectes et extraire les catégories
-    for collecte in collectes:
-        detail_panier = collecte.detail_panier
-        for categorie in detail_panier:
-            if categorie not in categories:
-                categories.append(categorie)
-
-    #### ####
-
-    #### Récupérer toutes les catégories socio-professionnelle
+    # Récupérations des données sur les clients
     clients = Client.objects.all()
 
-    # Créer un ensemble pour stocker les catégories uniques
-    categorie_socioprofessionnelle = []
+    # Récupération des différentes catégories socioprofessionnelle
+    categorie_socioprofessionnelles = list(Client.objects.values_list("categorie_socioprofessionnelle", flat=True).distinct())
 
-    # Parcourir toutes les collectes et extraire les catégories
-    for client in clients:
-        categorie_socio = client.categorie_socioprofessionnelle
-        if categorie_socio not in categorie_socioprofessionnelle:
-            categorie_socioprofessionnelle.append(categorie_socio)
+    # Récupération des différentes catégories de marchandises
+    categories = []
+    paniers = Collecte.objects.values_list('detail_panier', flat=True) 
+    for panier in paniers:
+        for cle in panier.keys():
+            if cle not in categories :
+                categories.append(cle)
 
-    #### ####
-
+    # Calcul des dépenses par catégories de marchandises pour chaque catégories professionnelle
     valeurs = {}
     for categorie in categories:
-        valeurs[categorie] = [0] * len(categorie_socioprofessionnelle)
+        valeurs[categorie] = [0] * len(categorie_socioprofessionnelles)
 
     for client in clients:
         detail_panier = client.identifiant_collecte.detail_panier
         categorie_socio = client.categorie_socioprofessionnelle
         for categorie, valeur in detail_panier.items():
-            index = categorie_socioprofessionnelle.index(categorie_socio)
+            index = categorie_socioprofessionnelles.index(categorie_socio)
             valeurs[categorie][index] += valeur
 
-    for liste in valeurs.values():
-        for i in range(len(liste)):
-            liste[i] = round(liste[i], 2)
+    # Arrondissement des valeurs des dépenses
+    for cle, valeur in valeurs.items():
+        valeurs_arrondies = [round(nombre, 2) for nombre in valeur]
+        valeurs[cle] = valeurs_arrondies
 
+    # Calcul des dépenses du panier moyen en fonction de la catégorie socioprofessionnelle
+    moyennes = Client.objects.values("categorie_socioprofessionnelle").annotate(panier_moyen=Avg("identifiant_collecte__prix_panier"))
+
+
+
+    # Arrondissement des valeurs des dépenses
+    for i in range(len(moyennes)):
+        moyennes[i]["panier_moyen"] = round(moyennes[i]["panier_moyen"], 2)
+    
     context = {
-        'moyennes': moyennes,
-        'categories': categories,
-        'categorie_socioprofessionnelle': categorie_socioprofessionnelle,
-        'valeurs': valeurs
+        "categorie_socioprofessionnelles" : categorie_socioprofessionnelles,
+        "valeurs" : valeurs,
+        "moyennes": moyennes
 
     }
+    
 
     return render(request, template, context)
 
@@ -77,24 +70,23 @@ def analyses(request):
 @permission_required("analyses.view_collecte", raise_exception=True)
 def exporter_donnees(request):
     if request.method == 'POST':
-        # Récupérer le nombre de lignes à exporter depuis le formulaire
-        nombre_lignes = int(request.POST.get('nombre_lignes', 10))  # La valeur par défaut est 10 si non spécifiée
+        # Récupérer le nombre de lignes à exporter depuis le formulaire avec 10 par défaut
+        nombre_lignes = int(request.POST.get('nombre_lignes', 10))
 
         # Récupérer les données à exporter depuis la base de données
-        donnees = Collecte.objects.all()[:nombre_lignes]  # Récupérez les premières 'nombre_lignes' lignes
+        donnees = Collecte.objects.all()[:nombre_lignes]
 
         response = HttpResponse(content_type='text/csv')
         response['Content-Disposition'] = 'attachment; filename="export.csv"'
 
         writer = csv.writer(response)
-        writer.writerow(['identifiant_collecte', 'detail_panier'])  # Entêtes (remplacez par les noms des champs de votre modèle)
+        writer.writerow(['identifiant_collecte', 'detail_panier'])
 
         for donnee in donnees:
-            writer.writerow([donnee.identifiant_collecte, donnee.detail_panier])  # Remplacez les noms de champ
+            writer.writerow([donnee.identifiant_collecte, donnee.detail_panier])
 
         return response
 
-    # Générez un formulaire pour que l'utilisateur spécifie le nombre de lignes
     return render(request, 'exportation_donnees.html')
 
 
