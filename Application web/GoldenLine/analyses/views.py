@@ -220,7 +220,7 @@ def modifier_utilisateur(request, nom_utilisateur):
         'permission_view_collecte': permission_view_collecte
     }
 
-    return render(request, 'modifier_utilisateur.html', context)
+    return render(request, 'modification_utilisateur.html', context)
 
 
 @login_required
