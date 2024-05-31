@@ -8,7 +8,7 @@
 
 
 ## Description
-Application web destinée à GoldenLine pour la visualisation de statistiques de sa clientèle.   
+Application web avec l'utilsation du framework Django destinée à GoldenLine pour la visualisation de statistiques de sa clientèle.
 
 
 
