@@ -1,7 +1,15 @@
 # Projet GoldenLine
 
+## Table des matières
+- [Description](#Description)
+- [Installation](#Installation)
+- [Utilisation](#utilisation)
+- [Auteur](#Auteur)
 
+
+## Description
 Application web destinée à GoldenLine pour la visualisation de statistiques de sa clientèle.   
+
 
 
 ## 🛠️ Installation
@@ -35,11 +43,27 @@ pip install -r requirements.txt
 py manage.py runserver
 ```
         
+## Utilisation
+Se rendre sur le site de l'application web en suivant le lien :
+[Application web](https://acruz19.pythonanywhere.com/).
 
+S'authentifié en utilisant vos identifians de connexion.
+
+La présentation de la page d'acceuil dépend des permissions que votre compte :
+- Analyse : peut voir les données statistiques.
+- Export : peut exporter les données de la base de données.
+- Administrateur : possède les toutes les permission, peut ajouter un utilisateurs et definir ses permission, modifier les permissions des utilisateurs existants, voir la liste des utilisateurs.
+
+## Tests de l'application
+Des tests de l'application peuvent être effectuées depuis le terminal avec la ligne de commande :
+```bash
+coverage run .\manage.py test
+```
+Pour voir le rapport des tests : 
+```bash
+coverage html
+```
 
 ## 🙇 Auteur
 #### Danglades Yohann
 - Github: [@acruz09](https://github.com/Acruz09)
-        
-        
-        
