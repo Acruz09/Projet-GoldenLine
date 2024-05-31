@@ -1,10 +1,10 @@
 # Projet GoldenLine
 
 ## Table des matières
-- [Description](#Description)
-- [Installation](#Installation)
+- [Description](#description)
+- [Installation](#installation)
 - [Utilisation](#utilisation)
-- [Auteur](#Auteur)
+- [Auteur](#auteur)
 
 
 ## Description
