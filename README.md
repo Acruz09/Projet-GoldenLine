@@ -2,7 +2,7 @@
 
 ## Table des matières
 - [Description](#description)
-- [Installation](#installation)
+- [Installation](#🛠️ installation)
 - [Utilisation](#utilisation)
 - [Auteur](#auteur)
 
