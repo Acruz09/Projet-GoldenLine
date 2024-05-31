@@ -23,16 +23,16 @@ git clone https://github.com/Acruz09/Projet-GoldenLine.git
 ```
 2. Accéder au répertoire du projet :
 ```bash
-cd <chemin-repertoire>
+cd '.\Projet-GoldenLine\Application web\' 
 ```
 3. Activer l'environnement virtuel :
 (pour Windows) :
 ```bash
-<chemin-repertoire>\bin\activate
+.\env_goldenline\Scripts\activate
 ```
 (pour MacOS et Linux) :
 ```bash
-source <chemin-repertoire>/bin/activate
+source env_goldenline/bin/activate
 ```
 4. Installer les dépendances :
 ```bash
